@@ -48,6 +48,7 @@ public class TimeClient {
 	PrintWriter out = null;
 	try {
 	    socket = new Socket("127.0.0.1", port);
+	    // 这里的输入输出针对的是客户端自己，从流中读入，写出到流
 	    in = new BufferedReader(new InputStreamReader(
 		    socket.getInputStream()));
 	    out = new PrintWriter(socket.getOutputStream(), true);
