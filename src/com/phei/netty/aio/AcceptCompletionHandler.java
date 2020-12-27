@@ -34,7 +34,7 @@ public class AcceptCompletionHandler implements
     public void completed(AsynchronousSocketChannel result,
                           AsyncTimeServerHandler attachment) {
         // 接受新的客户端的连接，连接成功后回调completed（) 每当有一个客户端连接成功后，再异步接收新的客户端连接
-        // TODO:此处accept应该是开了一个线程future在异步等待accept吧，否则哪里体现异步性和回调呢？
+        // TODO:此处accept应该是开了一个线程future在异步等待accept吧，否则哪里体现异步性和回调呢？--后续分析源码
         attachment.asynchronousServerSocketChannel.accept(attachment, this);
         ByteBuffer buffer = ByteBuffer.allocate(1024); // 分配1MB缓存即缓冲区
         // 发起异步读，当读取成功后回调ReadCompletionHandler
