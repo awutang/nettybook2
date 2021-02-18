@@ -24,13 +24,13 @@ import java.util.logging.Logger;
 
 /**
  * @author lilinfeng
- * @date 2014年2月14日
  * @version 1.0
+ * @date 2014年2月14日
  */
 public class TimeClientHandler extends ChannelHandlerAdapter {
 
     private static final Logger logger = Logger
-	    .getLogger(TimeClientHandler.class.getName());
+            .getLogger(TimeClientHandler.class.getName());
 
     private int counter;
 
@@ -40,36 +40,52 @@ public class TimeClientHandler extends ChannelHandlerAdapter {
      * Creates a client-side handler.
      */
     public TimeClientHandler() {
-	req = ("QUERY TIME ORDER" + System.getProperty("line.separator"))
-		.getBytes();
+        req = ("QUERY TIME ORDER" + System.getProperty("line.separator"))
+                .getBytes();
     }
 
-    @Override
+	/**
+	 * 发送100条消息，服务端应该也收到100条
+	 * @param ctx
+	 */
+	@Override
     public void channelActive(ChannelHandlerContext ctx) {
-	ByteBuf message = null;
-	for (int i = 0; i < 100; i++) {
-	    message = Unpooled.buffer(req.length);
-	    message.writeBytes(req);
-	    ctx.writeAndFlush(message);
-	}
+        ByteBuf message = null;
+        for (int i = 0; i < 100; i++) {
+            message = Unpooled.buffer(req.length);
+            message.writeBytes(req);
+            ctx.writeAndFlush(message);
+        }
     }
 
+	/**
+	 * 应该受到100条关于请求时间的响应
+	 *
+	 * Now is : BAD ORDER
+	 * BAD ORDER
+	 *  ; the counter is : 1
+	 *
+	 *  只收到了一条消息，包含两条BAD ORDER，说明服务端响应发生了粘包（因为服务端其实响应了两次，发了两条消息）
+	 * @param ctx
+	 * @param msg
+	 * @throws Exception
+	 */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
-	    throws Exception {
-	ByteBuf buf = (ByteBuf) msg;
-	byte[] req = new byte[buf.readableBytes()];
-	buf.readBytes(req);
-	String body = new String(req, "UTF-8");
-	System.out.println("Now is : " + body + " ; the counter is : "
-		+ ++counter);
+            throws Exception {
+        ByteBuf buf = (ByteBuf) msg;
+        byte[] req = new byte[buf.readableBytes()];
+        buf.readBytes(req);
+        String body = new String(req, "UTF-8");
+        System.out.println("Now is : " + body + " ; the counter is : "
+                + ++counter);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-	// 释放资源
-	logger.warning("Unexpected exception from downstream : "
-		+ cause.getMessage());
-	ctx.close();
+        // 释放资源
+        logger.warning("Unexpected exception from downstream : "
+                + cause.getMessage());
+        ctx.close();
     }
 }

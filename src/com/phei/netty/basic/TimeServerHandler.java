@@ -37,6 +37,7 @@ public class TimeServerHandler extends ChannelHandlerAdapter {
         System.out.println("The time server receive order : " + body);
         String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? new java.util.Date(
                 System.currentTimeMillis()).toString() : "BAD ORDER";
+        // 非内存池上分配堆内存
         ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
         ctx.write(resp);
     }

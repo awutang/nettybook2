@@ -44,6 +44,7 @@ public class TimeClient {
 			@Override
 			public void initChannel(SocketChannel ch)
 				throws Exception {
+				// 添加了处理读半包的handle
 			    ch.pipeline().addLast(
 				    new LineBasedFrameDecoder(1024));
 			    ch.pipeline().addLast(new StringDecoder());

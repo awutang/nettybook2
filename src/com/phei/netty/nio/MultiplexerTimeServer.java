@@ -55,6 +55,7 @@ public class MultiplexerTimeServer implements Runnable {
     public void run() {
         while (!stop) {
             try {
+                // epoll_wait操作开始，timeOut为1s
                 selector.select(1000);
 				// 返回ready的channel,这个channel是客户端的还是服务器的？
 				// --从下面的代码看来，如果是已经连接了的则就是客户端channel,这也确实，本来就是监听客户端channel的read

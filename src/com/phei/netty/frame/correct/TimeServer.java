@@ -58,6 +58,7 @@ public class TimeServer {
     private class ChildChannelHandler extends ChannelInitializer<SocketChannel> {
 	@Override
 	protected void initChannel(SocketChannel arg0) throws Exception {
+		// 添加了处理读半包的handler
 	    arg0.pipeline().addLast(new LineBasedFrameDecoder(1024));
 	    arg0.pipeline().addLast(new StringDecoder());
 	    arg0.pipeline().addLast(new TimeServerHandler());

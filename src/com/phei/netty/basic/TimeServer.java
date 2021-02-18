@@ -17,7 +17,8 @@ public class TimeServer {
 
     public void bind(int port) throws Exception {
         // 配置服务端的NIO线程组,处理网络事件，其实这就是reactor线程组，以下两个一个用于接收客户端连接、一个用于读写
-        // TODO:但是NioEventLoop中连接、读写都可以操作，所以为啥要搞两个线程组？线程组的功能是如何区分开的？
+        // 但是NioEventLoop中连接、读写都可以操作，所以为啥要搞两个线程组？--一个负责接收客户端连接，一个负责读写
+        // 线程组的功能是如何区分开的？--服务端接收客户端连接后生成客户端channel，这些channel对应的eventLoop是workerGroup的
 
         // 其实是创建了一个线程池,用于服务端接收客户端的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -26,7 +27,7 @@ public class TimeServer {
 
         try {
             // ServerBootstrap是netty用于启动NIO服务端的辅助启动类，目的是降低服务端的开发复杂度
-            // TODO：如何降低的？jdknio的代码需要十多行才能完成基本的消息读取与发送，用了ServerBootStrap就不需要了
+            // 如何降低的？jdknio的代码需要十多行才能完成基本的消息读取与发送，用了ServerBootStrap就不需要了
             ServerBootstrap b = new ServerBootstrap();
             // 将两个线程组传入serverBootStrap中
             b.group(bossGroup, workerGroup)
@@ -37,7 +38,7 @@ public class TimeServer {
                     // 绑定IO事件的处理类为ChildChannelHandler
                     .childHandler(new ChildChannelHandler());
             // bind()绑定监听端口，sync()同步等待绑定操作完成，ChannelFuture用于异步操作的通知回调
-            // TODO:epoll是IO多路复用给的，并不是AIO，所以哪些是异步操作？
+            // TODO:epoll是IO多路复用给的，并不是AIO，所以哪些是异步操作？--这里ServerBootstrap设置的异步指的是操作系统交互，比如ServerSocketChannel.accept()
             ChannelFuture f = b.bind(port).sync();
 
             // 等待服务端监听端口关闭操作完成
