@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2018 Lilinfeng.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +21,8 @@ import java.io.ObjectOutputStream;
 
 /**
  * @author Administrator
- * @date 2014年2月23日
  * @version 1.0
+ * @date 2014年2月23日
  */
 public class TestUserInfo {
 
@@ -31,19 +31,30 @@ public class TestUserInfo {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-	UserInfo info = new UserInfo();
-	info.buildUserID(100).buildUserName("Welcome to Netty");
-	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	ObjectOutputStream os = new ObjectOutputStream(bos);
-	os.writeObject(info);
-	os.flush();
-	os.close();
-	byte[] b = bos.toByteArray();
-	System.out.println("The jdk serializable length is : " + b.length);
-	bos.close();
-	System.out.println("-------------------------------------");
-	System.out.println("The byte array serializable length is : "
-		+ info.codeC().length);
+        UserInfo info = new UserInfo();
+        info.buildUserID(100).buildUserName("Welcome to Netty");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(bos);
+        // myTodo: 有空看下底层实现，搞懂字节数组的长度是怎么生成的
+        os.writeObject(info);
+
+        os.flush();
+        os.close();
+        byte[] b = bos.toByteArray();
+
+        /**
+         * The jdk serializable length is : 127
+         * -------------------------------------
+         * [B@61a52fbd
+         * The byte array serializable length is : 24
+         *
+         * 传统jdk序列化占用byte[]偏大，占据内存偏大，存储成本高、网络传输更占带宽（导致系统吞吐量变低）
+         */
+        System.out.println("The jdk serializable length is : " + b.length);
+        bos.close();
+        System.out.println("-------------------------------------");
+        System.out.println("The byte array serializable length is : "
+                + info.codeC().length);
 
     }
 
