@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2018 Lilinfeng.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,58 +29,61 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 
 /**
  * @author lilinfeng
- * @date 2014年2月14日
  * @version 1.0
+ * @date 2014年2月14日
  */
 public class HttpFileServer {
 
-    private static final String DEFAULT_URL = "/src/com/phei/netty/";
+    private static final String DEFAULT_URL = "/lib";
 
     public void run(final int port, final String url) throws Exception {
-	EventLoopGroup bossGroup = new NioEventLoopGroup();
-	EventLoopGroup workerGroup = new NioEventLoopGroup();
-	try {
-	    ServerBootstrap b = new ServerBootstrap();
-	    b.group(bossGroup, workerGroup)
-		    .channel(NioServerSocketChannel.class)
-		    .childHandler(new ChannelInitializer<SocketChannel>() {
-			@Override
-			protected void initChannel(SocketChannel ch)
-				throws Exception {
-			    ch.pipeline().addLast("http-decoder",
-				    new HttpRequestDecoder()); // 请求消息解码器
-			    ch.pipeline().addLast("http-aggregator",
-				    new HttpObjectAggregator(65536));// 目的是将多个消息转换为单一的request或者response对象
-			    ch.pipeline().addLast("http-encoder",
-				    new HttpResponseEncoder());//响应解码器
-			    ch.pipeline().addLast("http-chunked",
-				    new ChunkedWriteHandler());//目的是支持异步大文件传输（）
-			    ch.pipeline().addLast("fileServerHandler",
-				    new HttpFileServerHandler(url));// 业务逻辑
-			}
-		    });
-	    ChannelFuture future = b.bind("192.168.1.102", port).sync();
-	    System.out.println("HTTP文件目录服务器启动，网址是 : " + "http://192.168.1.102:"
-		    + port + url);
-	    future.channel().closeFuture().sync();
-	} finally {
-	    bossGroup.shutdownGracefully();
-	    workerGroup.shutdownGracefully();
-	}
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try {
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch)
+                                throws Exception {
+                            ch.pipeline().addLast("http-decoder",
+                                    new HttpRequestDecoder()); // 请求消息解码器
+                            ch.pipeline().addLast("http-aggregator",
+									// 解码 目的是将多个消息转换为单一的request或者response对象（因为HttpRequestDecoder对每条消息生成多个消息对象）
+                                    new HttpObjectAggregator(65536));
+                            ch.pipeline().addLast("http-encoder",
+                                    new HttpResponseEncoder());//响应编码器
+                            ch.pipeline().addLast("http-chunked",
+									// 目的是支持异步大文件传输（但不占用过多内存，防止OOM）
+                                    new ChunkedWriteHandler());
+                            ch.pipeline().addLast("fileServerHandler",
+                                    new HttpFileServerHandler(url));// 业务逻辑
+                        }
+                    });
+            ChannelFuture future = b.bind("127.0.0.1", port).sync();
+            System.out.println("HTTP文件目录服务器启动，网址是 : " + "http://127.0.0.1:"
+                    + port + url);
+            future.channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
     }
 
     public static void main(String[] args) throws Exception {
-	int port = 8080;
-	if (args.length > 0) {
-	    try {
-		port = Integer.parseInt(args[0]);
-	    } catch (NumberFormatException e) {
-		e.printStackTrace();
-	    }
-	}
-	String url = DEFAULT_URL;
-	if (args.length > 1)
-	    url = args[1];
-	new HttpFileServer().run(port, url);
+    	// port url（http服务端路径） 没有入参就取默认值
+        int port = 8080;
+        if (args.length > 0) {
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        String url = DEFAULT_URL;
+        if (args.length > 1)
+            url = args[1];
+        new HttpFileServer().run(port, url);
     }
 }

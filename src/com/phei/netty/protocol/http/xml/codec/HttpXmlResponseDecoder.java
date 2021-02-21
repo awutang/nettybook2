@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2018 Lilinfeng.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,26 +22,34 @@ import java.util.List;
 
 /**
  * @author Lilinfeng
- * @date 2014年3月1日
  * @version 1.0
+ * @date 2014年3月1日
  */
 public class HttpXmlResponseDecoder extends
-	AbstractHttpXmlDecoder<DefaultFullHttpResponse> {
+        AbstractHttpXmlDecoder<DefaultFullHttpResponse> {
 
     public HttpXmlResponseDecoder(Class<?> clazz) {
-	this(clazz, false);
+        this(clazz, false);
     }
 
     public HttpXmlResponseDecoder(Class<?> clazz, boolean isPrintlog) {
-	super(clazz, isPrintlog);
+        super(clazz, isPrintlog);
     }
 
+    /**
+     * 客户端收到http+xml响应后，解码
+     * @param ctx           the {@link ChannelHandlerContext} which this {@link MessageToMessageDecoder} belongs to
+     * @param msg           the message to decode to an other one
+     * @param out           the {@link List} to which decoded messages should be added
+     * @throws Exception
+     */
     @Override
     protected void decode(ChannelHandlerContext ctx,
-	    DefaultFullHttpResponse msg, List<Object> out) throws Exception {
-	HttpXmlResponse resHttpXmlResponse = new HttpXmlResponse(msg, decode0(
-		ctx, msg.content()));
-	out.add(resHttpXmlResponse);
+                          DefaultFullHttpResponse msg, List<Object> out) throws Exception {
+        // 1.消息体xml->pojo 2.构造HttpXmlResponse
+        HttpXmlResponse resHttpXmlResponse = new HttpXmlResponse(msg, decode0(
+                ctx, msg.content()));
+        out.add(resHttpXmlResponse);
     }
 
 }
