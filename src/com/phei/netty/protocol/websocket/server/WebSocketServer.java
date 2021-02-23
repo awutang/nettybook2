@@ -31,6 +31,8 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * @author lilinfeng
  * @version 1.0
  * @date 2014年2月14日
+ *
+ * webSocket协议-服务端
  */
 public class WebSocketServer {
     public void run(int port) throws Exception {

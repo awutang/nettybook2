@@ -38,10 +38,11 @@ public class TimeServer {
                     // 绑定IO事件的处理类为ChildChannelHandler
                     .childHandler(new ChildChannelHandler());
             // bind()绑定监听端口，sync()同步等待绑定操作完成，ChannelFuture用于异步操作的通知回调
-            // TODO:epoll是IO多路复用给的，并不是AIO，所以哪些是异步操作？--这里ServerBootstrap设置的异步指的是操作系统交互，比如ServerSocketChannel.accept()
+            // epoll是IO多路复用给的，并不是AIO，所以哪些是异步操作？--这里ServerBootstrap设置的异步指的是操作系统交互，比如ServerSocketChannel.accept()
+            // 此处sync()阻塞指的是等待在bossGroup中异步执行的bind操作
             ChannelFuture f = b.bind(port).sync();
 
-            // 等待服务端监听端口关闭操作完成
+            // 当前线程等待服务端监听端口关闭操作完成
             f.channel().closeFuture().sync();
         } finally {
             // 优雅退出，释放线程池资源

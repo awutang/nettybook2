@@ -64,6 +64,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         ctx.flush();
     }
 
+    /**
+     * 处理http消息，第一次建立webSocket连接
+     * @param ctx
+     * @param req
+     * @throws Exception
+     */
     private void handleHttpRequest(ChannelHandlerContext ctx,
                                    FullHttpRequest req) throws Exception {
 

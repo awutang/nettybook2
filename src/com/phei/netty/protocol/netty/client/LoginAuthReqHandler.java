@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2018 Lilinfeng.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,14 +15,13 @@
  */
 package com.phei.netty.protocol.netty.client;
 
+import com.phei.netty.protocol.netty.MessageType;
+import com.phei.netty.protocol.netty.struct.Header;
+import com.phei.netty.protocol.netty.struct.NettyMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-
-import com.phei.netty.protocol.netty.MessageType;
-import com.phei.netty.protocol.netty.struct.Header;
-import com.phei.netty.protocol.netty.struct.NettyMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
  * @author Lilinfeng
  * @version 1.0
  * @date 2014年3月15日
+ *
+ * 私有协议栈-握手发起
  */
 public class LoginAuthReqHandler extends ChannelHandlerAdapter {
 
@@ -40,6 +41,8 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
      * next {@link ChannelHandler} in the {@link ChannelPipeline}.
      * <p/>
      * Sub-classes may override this method to change behavior.
+     *
+     * tcp三次握手成功后，客户端发送握手请求消息
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -51,6 +54,8 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
      * the next {@link ChannelHandler} in the {@link ChannelPipeline}.
      * <p/>
      * Sub-classes may override this method to change behavior.
+     *
+     * 处理握手应答消息（是否通过了安全认证）
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg)
@@ -67,12 +72,17 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
                 ctx.close();
             } else {
                 LOG.info("Login is ok : " + message);
+                // 传播
                 ctx.fireChannelRead(msg);
             }
         } else
             ctx.fireChannelRead(msg);
     }
 
+    /**
+     * 握手消息-登陆
+     * @return
+     */
     private NettyMessage buildLoginReq() {
         NettyMessage message = new NettyMessage();
         Header header = new Header();
@@ -81,6 +91,12 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
         return message;
     }
 
+    /**
+     * 透传exception
+     * @param ctx
+     * @param cause
+     * @throws Exception
+     */
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
         ctx.fireExceptionCaught(cause);
