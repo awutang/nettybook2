@@ -68,7 +68,7 @@ public class NettyClient {
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
                             ch.pipeline().addLast(
-                                    // 单条消息最大长度：1024 * 1024
+                                    // 单条消息最大长度：1024 * 1024B=1Mb
                                     new NettyMessageDecoder(1024 * 1024, 4, 4));
                             ch.pipeline().addLast("MessageEncoder",
                                     new NettyMessageEncoder());

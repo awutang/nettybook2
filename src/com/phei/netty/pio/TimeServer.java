@@ -16,6 +16,7 @@
 package com.phei.netty.pio;
 
 import com.phei.netty.bio.TimeServerHandler;
+import io.netty.buffer.PooledByteBufAllocator;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -63,5 +64,7 @@ public class TimeServer {
                 server = null;
             }
         }
+
+        // PooledByteBufAllocator.DEFAULT.directBuffer();
     }
 }
