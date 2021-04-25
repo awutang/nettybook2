@@ -39,11 +39,19 @@ public class TimeServerHandler extends ChannelHandlerAdapter {
                 System.currentTimeMillis()).toString() : "BAD ORDER";
         // 非内存池上分配堆内存
         ByteBuf resp = Unpooled.copiedBuffer(currentTime.getBytes());
+
+        // 写到outBoundBuffer
         ctx.write(resp);
     }
 
+    /**
+     * 读完之后触发
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        // 将写到outBoundBuffer的resp刷到channel
         ctx.flush();
     }
 

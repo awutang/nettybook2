@@ -14,6 +14,9 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * jdk nio例子
+ */
 public class MultiplexerTimeServer implements Runnable {
 
     private Selector selector;
@@ -112,6 +115,7 @@ public class MultiplexerTimeServer implements Runnable {
                     // 因此如果之后要读取readBuffer的话需要将limit移到当前position处并position左移到0
                     readBuffer.flip();
                     byte[] bytes = new byte[readBuffer.remaining()];
+                    // 写入bytes
                     readBuffer.get(bytes);
                     String body = new String(bytes, "UTF-8");
                     System.out.println("The time server receive order : "
